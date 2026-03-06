@@ -6,12 +6,13 @@ import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
 
-@Database(entities = {DrinkEntry.class}, version = 1, exportSchema = false)
+@Database(entities = {DrinkEntry.class, DrinkType.class}, version = 2, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
 
     private static volatile AppDatabase INSTANCE;
 
     public abstract DrinkDao drinkDao();
+    public abstract DrinkTypeDao drinkTypeDao();
 
     public static AppDatabase getInstance(Context context) {
         if (INSTANCE == null) {

@@ -9,7 +9,7 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-import org.me.gcu.dramwise.R;
+import org.me.gcu.dramwise.data.DrinkRepository;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -17,6 +17,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        DrinkRepository.getInstance(this).seedDrinkTypesIfEmpty();
 
         NavHostFragment navHostFragment =
                 (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);

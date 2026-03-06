@@ -22,4 +22,9 @@
     <string name="history_title">History</string>
     <string name="insights_title">Insights</string>
     <string name="settings_title">Settings</string>
+
+    <string name="select_predefined_drink">Select a predefined drink</string>
+    <string name="drink_saved">Drink saved</string>
+    <string name="enter_drink_name">Enter a drink name</string>
+    <string name="enter_valid_volume_abv">Enter valid volume and ABV</string>
 </resources>

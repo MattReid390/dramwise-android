@@ -6,10 +6,13 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.AdapterView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -18,13 +21,21 @@ import androidx.fragment.app.Fragment;
 import org.me.gcu.dramwise.R;
 import org.me.gcu.dramwise.data.DrinkEntry;
 import org.me.gcu.dramwise.data.DrinkRepository;
+import org.me.gcu.dramwise.data.DrinkType;
 import org.me.gcu.dramwise.util.UnitsCalculator;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 public class AddDrinkFragment extends Fragment {
 
+    private Spinner spinnerDrinkType;
     private EditText etName, etVolume, etAbv;
     private TextView tvPreview;
     private Button btnSave;
+
+    private final List<DrinkType> drinkTypeList = new ArrayList<>();
 
     @Nullable
     @Override
@@ -33,6 +44,7 @@ public class AddDrinkFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_add_drink, container, false);
 
+        spinnerDrinkType = v.findViewById(R.id.spinner_drink_type);
         etName = v.findViewById(R.id.et_name);
         etVolume = v.findViewById(R.id.et_volume);
         etAbv = v.findViewById(R.id.et_abv);
@@ -40,28 +52,78 @@ public class AddDrinkFragment extends Fragment {
         btnSave = v.findViewById(R.id.btn_save);
 
         TextWatcher watcher = new TextWatcher() {
-            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            @Override public void onTextChanged(CharSequence s, int start, int before, int count) { updatePreview(); }
-            @Override public void afterTextChanged(Editable s) {}
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                updatePreview();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) { }
         };
 
         etVolume.addTextChangedListener(watcher);
         etAbv.addTextChangedListener(watcher);
 
-        btnSave.setOnClickListener(view -> save());
+        btnSave.setOnClickListener(view -> saveDrink());
 
+        loadDrinkTypes();
         updatePreview();
+
         return v;
+    }
+
+    private void loadDrinkTypes() {
+        DrinkRepository.getInstance(requireContext()).getAllDrinkTypes()
+                .observe(getViewLifecycleOwner(), drinkTypes -> {
+                    drinkTypeList.clear();
+
+                    List<String> names = new ArrayList<>();
+                    names.add("Select a predefined drink");
+
+                    if (drinkTypes != null) {
+                        drinkTypeList.addAll(drinkTypes);
+                        for (DrinkType drinkType : drinkTypes) {
+                            names.add(drinkType.name);
+                        }
+                    }
+
+                    ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                            requireContext(),
+                            android.R.layout.simple_spinner_item,
+                            names
+                    );
+                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                    spinnerDrinkType.setAdapter(adapter);
+
+                    spinnerDrinkType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                        @Override
+                        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                            if (position == 0) return;
+
+                            DrinkType selected = drinkTypeList.get(position - 1);
+                            etName.setText(selected.name);
+                            etVolume.setText(String.format(Locale.UK, "%.0f", selected.defaultVolumeMl));
+                            etAbv.setText(String.format(Locale.UK, "%.1f", selected.abv));
+                            updatePreview();
+                        }
+
+                        @Override
+                        public void onNothingSelected(AdapterView<?> parent) { }
+                    });
+                });
     }
 
     private void updatePreview() {
         double volume = parseDouble(etVolume.getText().toString());
         double abv = parseDouble(etAbv.getText().toString());
         double units = UnitsCalculator.calculateUnits(volume, abv);
-        tvPreview.setText(getString(R.string.preview_units, units));
+        tvPreview.setText(String.format(Locale.UK, "Preview units: %.2f", units));
     }
 
-    private void save() {
+    private void saveDrink() {
         String name = etName.getText().toString().trim();
         double volume = parseDouble(etVolume.getText().toString());
         double abv = parseDouble(etAbv.getText().toString());
@@ -70,6 +132,7 @@ public class AddDrinkFragment extends Fragment {
             Toast.makeText(requireContext(), "Enter a drink name", Toast.LENGTH_SHORT).show();
             return;
         }
+
         if (volume <= 0 || abv <= 0) {
             Toast.makeText(requireContext(), "Enter valid volume and ABV", Toast.LENGTH_SHORT).show();
             return;
@@ -80,20 +143,21 @@ public class AddDrinkFragment extends Fragment {
 
         DrinkRepository.getInstance(requireContext()).insert(entry);
 
-        Toast.makeText(requireContext(), getString(R.string.saved_message), Toast.LENGTH_SHORT).show();
+        Toast.makeText(requireContext(), "Drink saved", Toast.LENGTH_SHORT).show();
 
         etName.setText("");
         etVolume.setText("");
         etAbv.setText("");
+        spinnerDrinkType.setSelection(0);
         updatePreview();
     }
 
-    private double parseDouble(String s) {
+    private double parseDouble(String value) {
         try {
-            if (s == null) return 0.0;
-            s = s.trim();
-            if (s.isEmpty()) return 0.0;
-            return Double.parseDouble(s);
+            if (value == null || value.trim().isEmpty()) {
+                return 0.0;
+            }
+            return Double.parseDouble(value.trim());
         } catch (Exception e) {
             return 0.0;
         }

@@ -12,12 +12,14 @@ public class DrinkRepository {
 
     private static volatile DrinkRepository INSTANCE;
 
-    private final DrinkDao dao;
+    private final DrinkDao drinkDao;
+    private final DrinkTypeDao drinkTypeDao;
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
     private DrinkRepository(Context context) {
         AppDatabase db = AppDatabase.getInstance(context);
-        this.dao = db.drinkDao();
+        this.drinkDao = db.drinkDao();
+        this.drinkTypeDao = db.drinkTypeDao();
     }
 
     public static DrinkRepository getInstance(Context context) {
@@ -31,19 +33,57 @@ public class DrinkRepository {
         return INSTANCE;
     }
 
+    // -------------------------
+    // DrinkEntry methods
+    // -------------------------
+
     public void insert(DrinkEntry entry) {
-        executor.execute(() -> dao.insert(entry));
+        executor.execute(() -> drinkDao.insert(entry));
     }
 
     public LiveData<List<DrinkEntry>> getAll() {
-        return dao.getAll();
+        return drinkDao.getAll();
     }
 
     public LiveData<Integer> countBetween(long startMillis, long endMillis) {
-        return dao.countBetween(startMillis, endMillis);
+        return drinkDao.countBetween(startMillis, endMillis);
     }
 
     public LiveData<Double> sumUnitsBetween(long startMillis, long endMillis) {
-        return dao.sumUnitsBetween(startMillis, endMillis);
+        return drinkDao.sumUnitsBetween(startMillis, endMillis);
+    }
+
+    // -------------------------
+    // DrinkType methods
+    // -------------------------
+
+    public LiveData<List<DrinkType>> getAllDrinkTypes() {
+        return drinkTypeDao.getAll();
+    }
+
+    public void insertDrinkType(DrinkType drinkType) {
+        executor.execute(() -> drinkTypeDao.insert(drinkType));
+    }
+
+    public void insertDrinkTypes(List<DrinkType> drinkTypes) {
+        executor.execute(() -> drinkTypeDao.insertAll(drinkTypes));
+    }
+
+    public void seedDrinkTypesIfEmpty() {
+        executor.execute(() -> {
+            int count = drinkTypeDao.getCount();
+            if (count == 0) {
+                drinkTypeDao.insertAll(java.util.Arrays.asList(
+                        new DrinkType("Guinness", "Beer", 568, 4.2),
+                        new DrinkType("Heineken", "Beer", 568, 5.0),
+                        new DrinkType("Budweiser", "Beer", 568, 5.0),
+                        new DrinkType("Corona", "Beer", 355, 4.6),
+                        new DrinkType("Peroni", "Beer", 330, 5.1),
+                        new DrinkType("Stella Artois", "Beer", 568, 5.2),
+                        new DrinkType("Carlsberg", "Beer", 568, 3.8),
+                        new DrinkType("Coors Light", "Beer", 568, 4.0)
+                ));
+            }
+        });
     }
 }
