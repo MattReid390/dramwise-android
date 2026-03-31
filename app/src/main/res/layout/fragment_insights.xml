@@ -1,14 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+    Scrollable container for the Insights screen.
+    Ensures the chart and summary text remain accessible on smaller screens.
+-->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:padding="16dp">
+    android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/tv_insights"
+    <!--
+        Vertical layout holding the weekly title, bar chart, and summary text.
+        Padding provides consistent spacing around all content.
+    -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Insights will appear here."
-        android:textSize="14sp" />
+        android:orientation="vertical"
+        android:padding="16dp">
 
+        <!-- Section title for the weekly insights -->
+        <TextView
+            android:id="@+id/textWeeklyTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:text="Last 7 Days"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <!--
+            MPAndroidChart BarChart displaying units consumed per day.
+            Fixed height ensures consistent visual layout.
+        -->
+        <com.github.mikephil.charting.charts.BarChart
+            android:id="@+id/barChartWeeklyUnits"
+            android:layout_width="match_parent"
+            android:layout_height="320dp"
+            android:layout_marginBottom="16dp" />
+
+        <!--
+            Summary text showing weekly total, average, and guideline comparison.
+            Expands naturally based on content.
+        -->
+        <TextView
+            android:id="@+id/textWeeklySummary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="16sp" />
+
+    </LinearLayout>
 </ScrollView>
