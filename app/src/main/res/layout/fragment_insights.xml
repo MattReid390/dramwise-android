@@ -8,8 +8,8 @@
     android:layout_height="match_parent">
 
     <!--
-        Vertical layout holding the weekly title, bar chart, and summary text.
-        Padding provides consistent spacing around all content.
+        Vertical layout holding the weekly title, bar chart, summary text,
+        and smart feedback section.
     -->
     <LinearLayout
         android:layout_width="match_parent"
@@ -38,11 +38,55 @@
             android:layout_marginBottom="16dp" />
 
         <!--
-            Summary text showing weekly total, average, and guideline comparison.
-            Expands naturally based on content.
+            Summary text showing weekly total and daily average.
         -->
         <TextView
             android:id="@+id/textWeeklySummary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/textRiskTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="Risk Level"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/textRiskBadge"
+            android:background="@drawable/bg_risk_badge_low"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:paddingLeft="12dp"
+            android:paddingTop="8dp"
+            android:paddingRight="12dp"
+            android:paddingBottom="8dp"
+            android:text="Low"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <!-- Section title for personalised smart feedback -->
+        <TextView
+            android:id="@+id/textFeedbackTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="Smart Feedback"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <!--
+            Text area for rule-based personalised feedback.
+            This will display risk-related and behaviour-related messages.
+        -->
+        <TextView
+            android:id="@+id/textSmartFeedback"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="16sp" />

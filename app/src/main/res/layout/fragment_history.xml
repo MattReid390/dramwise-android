@@ -1,14 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+    Scrollable container for the history screen.
+    Ensures long text histories remain accessible on all screen sizes.
+-->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp">
 
-    <TextView
-        android:id="@+id/tv_history"
+    <!--
+        Vertical layout holding the "Clear History" button
+        and the text-based list of drink entries.
+    -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="No entries yet."
-        android:textSize="14sp" />
+        android:orientation="vertical">
 
+        <!-- Button allowing the user to delete all saved drink entries -->
+        <Button
+            android:id="@+id/btn_clear_history"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:text="Clear History" />
+
+        <!--
+            Displays the formatted history of drink entries.
+            Starts with a placeholder message until data is loaded.
+        -->
+        <TextView
+            android:id="@+id/tv_history"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="No drinks logged yet.\nStart tracking to see your history."
+            android:textSize="14sp" />
+
+    </LinearLayout>
 </ScrollView>

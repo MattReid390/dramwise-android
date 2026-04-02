@@ -1,5 +1,6 @@
 package org.me.gcu.dramwise.ui.insights;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,12 +37,15 @@ import java.util.Map;
 
 /**
  * Fragment responsible for displaying weekly drinking insights.
- * Shows a bar chart of units per day and a summary of weekly totals.
+ * Shows a bar chart of units per day, a weekly summary,
+ * and rule-based smart feedback.
  */
 public class InsightsFragment extends Fragment {
 
     private BarChart barChart;
     private TextView textWeeklySummary;
+    private TextView textRiskBadge;
+    private TextView textSmartFeedback;
     private DrinkRepository repository;
 
     @Nullable
@@ -50,20 +54,17 @@ public class InsightsFragment extends Fragment {
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
 
-        // Inflate layout for this fragment
         View v = inflater.inflate(R.layout.fragment_insights, container, false);
 
-        // UI references
         barChart = v.findViewById(R.id.barChartWeeklyUnits);
         textWeeklySummary = v.findViewById(R.id.textWeeklySummary);
+        textRiskBadge = v.findViewById(R.id.textRiskBadge);
+        textSmartFeedback = v.findViewById(R.id.textSmartFeedback);
 
-        // Repository for accessing Room data
         repository = DrinkRepository.getInstance(requireContext());
 
-        // Configure chart styling and behaviour
         setupChartAppearance();
 
-        // Observe LiveData for last 7 days of units and update chart when data changes
         repository.getUnitsLast7Days()
                 .observe(getViewLifecycleOwner(), this::updateWeeklyChart);
 
@@ -72,7 +73,6 @@ public class InsightsFragment extends Fragment {
 
     /**
      * Configures the static appearance and behaviour of the bar chart.
-     * This includes axis settings, legend visibility, and interaction rules.
      */
     private void setupChartAppearance() {
         barChart.setFitBars(true);
@@ -82,38 +82,32 @@ public class InsightsFragment extends Fragment {
         barChart.setScaleEnabled(false);
         barChart.setPinchZoom(false);
 
-        // Remove default description text
         Description description = new Description();
         description.setText("");
         barChart.setDescription(description);
 
-        // Enable legend (shows dataset label)
         Legend legend = barChart.getLegend();
-        legend.setEnabled(true);
+        legend.setEnabled(false);
 
-        // Configure X-axis (bottom labels)
         XAxis xAxis = barChart.getXAxis();
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
         xAxis.setGranularity(1f);
         xAxis.setDrawGridLines(false);
 
-        // Configure left Y-axis (units)
         YAxis leftAxis = barChart.getAxisLeft();
         leftAxis.setAxisMinimum(0f);
         leftAxis.setGranularity(1f);
 
-        // Disable right Y-axis for cleaner look
         YAxis rightAxis = barChart.getAxisRight();
         rightAxis.setEnabled(false);
     }
 
     /**
-     * Updates the bar chart and summary text using the last 7 days of data.
-     * Converts database date strings into chart labels and calculates totals.
+     * Updates the bar chart, summary text, and smart feedback
+     * using the last 7 days of data.
      */
     private void updateWeeklyChart(List<DailyUnits> databaseResults) {
 
-        // Map of dateString -> units for quick lookup
         Map<String, Float> unitsByDay = new HashMap<>();
 
         if (databaseResults != null) {
@@ -125,13 +119,9 @@ public class InsightsFragment extends Fragment {
         List<BarEntry> entries = new ArrayList<>();
         List<String> labels = new ArrayList<>();
 
-        // Format used by SQLite query (yyyy-MM-dd)
         SimpleDateFormat dbDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-
-        // Format for chart labels (Mon, Tue, etc.)
         SimpleDateFormat labelFormat = new SimpleDateFormat("EEE", Locale.getDefault());
 
-        // Start at midnight 6 days ago (covers 7 days including today)
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.HOUR_OF_DAY, 0);
         calendar.set(Calendar.MINUTE, 0);
@@ -141,29 +131,40 @@ public class InsightsFragment extends Fragment {
 
         float weeklyTotal = 0f;
         float maxDay = 0f;
+        float weekendTotal = 0f;
+        float weekdayTotal = 0f;
+        String highestDayLabel = "";
 
-        // Build chart entries for each of the last 7 days
         for (int i = 0; i < 7; i++) {
             String dbKey = dbDateFormat.format(calendar.getTime());
             String label = labelFormat.format(calendar.getTime());
 
-            // Units for this day (0 if no entry)
             float totalUnits = unitsByDay.getOrDefault(dbKey, 0f);
 
             entries.add(new BarEntry(i, totalUnits));
             labels.add(label);
 
             weeklyTotal += totalUnits;
-            maxDay = Math.max(maxDay, totalUnits);
+
+            if (totalUnits > maxDay) {
+                maxDay = totalUnits;
+                highestDayLabel = label;
+            }
+
+            int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
+            if (dayOfWeek == Calendar.SATURDAY || dayOfWeek == Calendar.SUNDAY) {
+                weekendTotal += totalUnits;
+            } else {
+                weekdayTotal += totalUnits;
+            }
 
             calendar.add(Calendar.DAY_OF_YEAR, 1);
         }
 
-        // Create dataset for the chart
         BarDataSet dataSet = new BarDataSet(entries, "Units per Day");
         dataSet.setValueTextSize(12f);
+        dataSet.setColor(Color.parseColor("#4CAF50"));
 
-        // Format bar values to 1 decimal place
         BarData barData = new BarData(dataSet);
         barData.setBarWidth(0.6f);
         barData.setValueFormatter(new ValueFormatter() {
@@ -171,39 +172,90 @@ public class InsightsFragment extends Fragment {
 
             @Override
             public String getBarLabel(BarEntry barEntry) {
+                if (barEntry.getY() == 0f) {
+                    return "0";
+                }
                 return format.format(barEntry.getY());
             }
         });
 
         barChart.setData(barData);
 
-        // Apply X-axis labels (Mon, Tue, etc.)
         XAxis xAxis = barChart.getXAxis();
         xAxis.setValueFormatter(new IndexAxisValueFormatter(labels));
         xAxis.setLabelCount(labels.size());
         xAxis.setAxisMinimum(-0.5f);
         xAxis.setAxisMaximum(6.5f);
 
-        // Adjust Y-axis max to fit the highest bar comfortably
         YAxis leftAxis = barChart.getAxisLeft();
-        leftAxis.setAxisMaximum(Math.max(5f, maxDay + 2f));
+        leftAxis.setAxisMaximum(Math.max(10f, maxDay + 2f));
 
-        // Animate and refresh chart
         barChart.animateY(800);
         barChart.invalidate();
 
-        // Build weekly summary text
         DecimalFormat summaryFormat = new DecimalFormat("0.0");
         String summary = "Total this week: " + summaryFormat.format(weeklyTotal)
                 + " units\nAverage per day: " + summaryFormat.format(weeklyTotal / 7f) + " units";
 
-        // Compare against UK recommended guideline (14 units/week)
-        if (weeklyTotal > 14f) {
-            summary += "\nYou are above the recommended weekly guideline.";
+        textWeeklySummary.setText(summary);
+
+        updateRiskBadge(weeklyTotal);
+
+        textSmartFeedback.setText(
+                generateSmartFeedback(weeklyTotal, maxDay, weekendTotal, weekdayTotal, highestDayLabel)
+        );
+    }
+
+    private void updateRiskBadge(float weeklyTotal) {
+        if (weeklyTotal == 0f) {
+            textRiskBadge.setText("No Data");
+            textRiskBadge.setBackgroundResource(R.drawable.bg_risk_badge_low);
+        } else if (weeklyTotal > 14f) {
+            textRiskBadge.setText("High");
+            textRiskBadge.setBackgroundResource(R.drawable.bg_risk_badge_high);
+        } else if (weeklyTotal >= 10f) {
+            textRiskBadge.setText("Moderate");
+            textRiskBadge.setBackgroundResource(R.drawable.bg_risk_badge_moderate);
         } else {
-            summary += "\nYou are within the recommended weekly guideline.";
+            textRiskBadge.setText("Low");
+            textRiskBadge.setBackgroundResource(R.drawable.bg_risk_badge_low);
+        }
+    }
+
+    /**
+     * Generates rule-based personalised feedback from weekly drinking patterns.
+     */
+    private String generateSmartFeedback(float weeklyTotal, float maxDay, float weekendTotal, float weekdayTotal, String highestDayLabel) {
+        StringBuilder feedback = new StringBuilder();
+
+        if (weeklyTotal == 0f) {
+            return "No drinking data recorded in the last 7 days yet.";
         }
 
-        textWeeklySummary.setText(summary);
+        if (weeklyTotal > 14f) {
+            feedback.append("You are above the recommended weekly guideline. ");
+        } else {
+            feedback.append("Your drinking this week is within the recommended weekly guideline. ");
+        }
+
+        if (maxDay >= 6f && !highestDayLabel.isEmpty()) {
+            feedback.append("Your highest intake day was ")
+                    .append(highestDayLabel)
+                    .append(", which may increase short-term health risk. ");
+        }
+
+        if (weekendTotal > weekdayTotal && weekendTotal >= (weeklyTotal * 0.6f)) {
+            feedback.append("Most of your drinking is concentrated at the weekend. ");
+        }
+
+        if (weeklyTotal >= 20f) {
+            feedback.append("This pattern may indicate elevated alcohol-related risk.");
+        } else if (weeklyTotal >= 10f) {
+            feedback.append("Your current pattern suggests moderate alcohol consumption.");
+        } else {
+            feedback.append("Your current pattern suggests relatively low alcohol consumption.");
+        }
+
+        return "• " + feedback.toString().trim().replace(". ", ".\n• ");
     }
 }

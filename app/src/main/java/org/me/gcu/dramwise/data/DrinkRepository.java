@@ -109,6 +109,13 @@ public class DrinkRepository {
         return drinkDao.getUnitsLast7Days(startTime);
     }
 
+    /**
+     *  Deletes all saved drink history on a background thread/
+     */
+    public void clearHistory() {
+        executor.execute(drinkDao::deleteAll);
+    }
+
     // ---------------------------------------------------------
     // DrinkType methods
     // ---------------------------------------------------------
