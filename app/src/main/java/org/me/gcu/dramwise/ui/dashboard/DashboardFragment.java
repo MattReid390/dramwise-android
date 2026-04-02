@@ -9,10 +9,9 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import org.me.gcu.dramwise.R;
-import org.me.gcu.dramwise.data.DrinkRepository;
-import org.me.gcu.dramwise.util.DateUtil;
 
 public class DashboardFragment extends Fragment {
 
@@ -29,16 +28,18 @@ public class DashboardFragment extends Fragment {
         tvTodayDrinks = v.findViewById(R.id.tv_today_drinks);
         tvTodayUnits = v.findViewById(R.id.tv_today_units);
 
-        DrinkRepository repo = DrinkRepository.getInstance(requireContext());
-        long start = DateUtil.startOfTodayMillis();
-        long end = DateUtil.endOfTodayMillis();
+        // FIXED: Obtain ViewModel instead of accessing the repository directly.
+        // The ViewModel survives configuration changes (e.g. screen rotation)
+        // so LiveData is not re-subscribed unnecessarily.
+        DashboardViewModel viewModel =
+                new ViewModelProvider(this).get(DashboardViewModel.class);
 
-        repo.countBetween(start, end).observe(getViewLifecycleOwner(), count -> {
+        viewModel.getTodayDrinkCount().observe(getViewLifecycleOwner(), count -> {
             int safeCount = (count == null) ? 0 : count;
             tvTodayDrinks.setText(getString(R.string.today_drinks, safeCount));
         });
 
-        repo.sumUnitsBetween(start, end).observe(getViewLifecycleOwner(), sum -> {
+        viewModel.getTodayUnits().observe(getViewLifecycleOwner(), sum -> {
             double safeSum = (sum == null) ? 0.0 : sum;
             tvTodayUnits.setText(getString(R.string.today_units, safeSum));
         });

@@ -12,10 +12,10 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import org.me.gcu.dramwise.R;
 import org.me.gcu.dramwise.data.DrinkEntry;
-import org.me.gcu.dramwise.data.DrinkRepository;
 import org.me.gcu.dramwise.util.DateUtil;
 
 import java.util.List;
@@ -28,7 +28,6 @@ public class HistoryFragment extends Fragment {
 
     private TextView tvHistory;
     private Button btnClearHistory;
-    private DrinkRepository repository;
 
     @Nullable
     @Override
@@ -43,23 +42,25 @@ public class HistoryFragment extends Fragment {
         tvHistory = v.findViewById(R.id.tv_history);
         btnClearHistory = v.findViewById(R.id.btn_clear_history);
 
-        // Repository for accessing Room database
-        repository = DrinkRepository.getInstance(requireContext());
+        // FIXED: Obtain ViewModel instead of accessing the repository directly.
+        // The ViewModel survives configuration changes (e.g. screen rotation)
+        // so LiveData is not re-subscribed unnecessarily.
+        HistoryViewModel viewModel =
+                new ViewModelProvider(this).get(HistoryViewModel.class);
 
         // Observe all drink entries and update the UI whenever data changes
-        repository.getAll().observe(getViewLifecycleOwner(), this::render);
+        viewModel.getAllEntries().observe(getViewLifecycleOwner(), this::render); // FIXED
 
         // Clear history button with confirmation dialog
         btnClearHistory.setOnClickListener(view ->
                 new AlertDialog.Builder(requireContext())
-                        .setTitle("Clear History")
-                        .setMessage("Are you sure you want to delete all saved drink entries?")
-                        .setPositiveButton("Delete", (dialog, which) -> {
-                            // Clear all entries and notify user
-                            repository.clearHistory();
-                            Toast.makeText(requireContext(), "History cleared", Toast.LENGTH_SHORT).show();
+                        .setTitle(getString(R.string.history_clear_title))
+                        .setMessage(getString(R.string.history_clear_message))
+                        .setPositiveButton(getString(R.string.history_clear_confirm), (dialog, which) -> {
+                            viewModel.clearHistory(); // FIXED
+                            Toast.makeText(requireContext(), getString(R.string.history_cleared_toast), Toast.LENGTH_SHORT).show();
                         })
-                        .setNegativeButton("Cancel", null)
+                        .setNegativeButton(getString(R.string.history_clear_cancel), null)
                         .show()
         );
 
@@ -72,7 +73,7 @@ public class HistoryFragment extends Fragment {
      */
     private void render(List<DrinkEntry> entries) {
         if (entries == null || entries.isEmpty()) {
-            tvHistory.setText("No drinks logged yet.\nStart tracking to see your history..");
+            tvHistory.setText(getString(R.string.history_empty));
             return;
         }
 

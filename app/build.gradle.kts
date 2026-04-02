@@ -23,11 +23,19 @@ android {
         // Internal versioning for Play Store updates
         versionCode = 1
 
-        // Human‑readable version name
+        // Human-readable version name
         versionName = "1.0"
 
         // Test runner for instrumentation tests
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // FIXED: Export Room database schemas to a local directory so that
+        // migrations can be verified and tracked alongside the source code.
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments["room.schemaLocation"] = "$projectDir/schemas"
+            }
+        }
     }
 
     buildTypes {
@@ -52,7 +60,7 @@ android {
     }
 
     buildFeatures {
-        // Enables ViewBinding for type‑safe view access
+        // Enables ViewBinding for type-safe view access
         viewBinding = true
     }
 }

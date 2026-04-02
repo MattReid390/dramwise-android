@@ -81,7 +81,7 @@ public class AddDrinkFragment extends Fragment {
                     drinkTypeList.clear();
 
                     List<String> names = new ArrayList<>();
-                    names.add("Select a predefined drink");
+                    names.add(getString(R.string.select_predefined_drink)); // FIXED
 
                     if (drinkTypes != null) {
                         drinkTypeList.addAll(drinkTypes);
@@ -120,7 +120,7 @@ public class AddDrinkFragment extends Fragment {
         double volume = parseDouble(etVolume.getText().toString());
         double abv = parseDouble(etAbv.getText().toString());
         double units = UnitsCalculator.calculateUnits(volume, abv);
-        tvPreview.setText(String.format(Locale.UK, "Preview units: %.2f", units));
+        tvPreview.setText(getString(R.string.preview_units, units)); // FIXED
     }
 
     private void saveDrink() {
@@ -129,12 +129,12 @@ public class AddDrinkFragment extends Fragment {
         double abv = parseDouble(etAbv.getText().toString());
 
         if (name.isEmpty()) {
-            Toast.makeText(requireContext(), "Enter a drink name", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), getString(R.string.enter_drink_name), Toast.LENGTH_SHORT).show(); // FIXED
             return;
         }
 
         if (volume <= 0 || abv <= 0) {
-            Toast.makeText(requireContext(), "Enter valid volume and ABV", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), getString(R.string.enter_valid_volume_abv), Toast.LENGTH_SHORT).show(); // FIXED
             return;
         }
 
@@ -143,7 +143,7 @@ public class AddDrinkFragment extends Fragment {
 
         DrinkRepository.getInstance(requireContext()).insert(entry);
 
-        Toast.makeText(requireContext(), "Drink saved", Toast.LENGTH_SHORT).show();
+        Toast.makeText(requireContext(), getString(R.string.drink_saved), Toast.LENGTH_SHORT).show(); // FIXED
 
         etName.setText("");
         etVolume.setText("");

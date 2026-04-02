@@ -10,6 +10,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.components.Description;
@@ -24,7 +25,6 @@ import com.github.mikephil.charting.formatter.ValueFormatter;
 
 import org.me.gcu.dramwise.R;
 import org.me.gcu.dramwise.data.DailyUnits;
-import org.me.gcu.dramwise.data.DrinkRepository;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -46,7 +46,6 @@ public class InsightsFragment extends Fragment {
     private TextView textWeeklySummary;
     private TextView textRiskBadge;
     private TextView textSmartFeedback;
-    private DrinkRepository repository;
 
     @Nullable
     @Override
@@ -61,12 +60,15 @@ public class InsightsFragment extends Fragment {
         textRiskBadge = v.findViewById(R.id.textRiskBadge);
         textSmartFeedback = v.findViewById(R.id.textSmartFeedback);
 
-        repository = DrinkRepository.getInstance(requireContext());
-
         setupChartAppearance();
 
-        repository.getUnitsLast7Days()
-                .observe(getViewLifecycleOwner(), this::updateWeeklyChart);
+        // FIXED: Obtain ViewModel instead of accessing the repository directly.
+        // The ViewModel survives configuration changes (e.g. screen rotation)
+        // so LiveData is not re-subscribed unnecessarily.
+        InsightsViewModel viewModel =
+                new ViewModelProvider(this).get(InsightsViewModel.class);
+
+        viewModel.getWeeklyUnits().observe(getViewLifecycleOwner(), this::updateWeeklyChart); // FIXED
 
         return v;
     }
@@ -194,9 +196,9 @@ public class InsightsFragment extends Fragment {
         barChart.invalidate();
 
         DecimalFormat summaryFormat = new DecimalFormat("0.0");
-        String summary = "Total this week: " + summaryFormat.format(weeklyTotal)
-                + " units\nAverage per day: " + summaryFormat.format(weeklyTotal / 7f) + " units";
-
+        String summary = getString(R.string.insights_summary,
+                summaryFormat.format(weeklyTotal),
+                summaryFormat.format(weeklyTotal / 7f));
         textWeeklySummary.setText(summary);
 
         updateRiskBadge(weeklyTotal);
@@ -208,16 +210,16 @@ public class InsightsFragment extends Fragment {
 
     private void updateRiskBadge(float weeklyTotal) {
         if (weeklyTotal == 0f) {
-            textRiskBadge.setText("No Data");
+            textRiskBadge.setText(getString(R.string.risk_no_data));
             textRiskBadge.setBackgroundResource(R.drawable.bg_risk_badge_low);
         } else if (weeklyTotal > 14f) {
-            textRiskBadge.setText("High");
+            textRiskBadge.setText(getString(R.string.risk_high));
             textRiskBadge.setBackgroundResource(R.drawable.bg_risk_badge_high);
         } else if (weeklyTotal >= 10f) {
-            textRiskBadge.setText("Moderate");
+            textRiskBadge.setText(getString(R.string.risk_moderate));
             textRiskBadge.setBackgroundResource(R.drawable.bg_risk_badge_moderate);
         } else {
-            textRiskBadge.setText("Low");
+            textRiskBadge.setText(getString(R.string.risk_low));
             textRiskBadge.setBackgroundResource(R.drawable.bg_risk_badge_low);
         }
     }
@@ -229,7 +231,7 @@ public class InsightsFragment extends Fragment {
         StringBuilder feedback = new StringBuilder();
 
         if (weeklyTotal == 0f) {
-            return "No drinking data recorded in the last 7 days yet.";
+            return getString(R.string.insights_no_data_feedback);
         }
 
         if (weeklyTotal > 14f) {

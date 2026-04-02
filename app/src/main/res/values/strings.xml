@@ -1,30 +1,61 @@
 <resources>
     <string name="app_name">DramWise</string>
 
+    <!-- Bottom navigation labels -->
     <string name="nav_dashboard">Dashboard</string>
     <string name="nav_add">Add</string>
     <string name="nav_history">History</string>
     <string name="nav_insights">Insights</string>
     <string name="nav_settings">Settings</string>
 
+    <!-- Add Drink screen -->
     <string name="hint_drink_name">Drink name (e.g., Beer)</string>
     <string name="hint_volume_ml">Volume (ml)</string>
     <string name="hint_abv">ABV (%)</string>
     <string name="btn_save">Save</string>
+    <string name="select_predefined_drink">Select a predefined drink</string>
+    <string name="preview_units">Preview units: %1$.2f</string>
+    <string name="drink_saved">Drink saved</string>
+    <string name="enter_drink_name">Enter a drink name</string>
+    <string name="enter_valid_volume_abv">Enter valid volume and ABV</string>
 
+    <!-- Dashboard screen -->
     <string name="today_label">Today</string>
     <string name="today_drinks">Drinks: %1$d</string>
     <string name="today_units">Units: %1$.2f</string>
 
-    <string name="preview_units">Preview units: %1$.2f</string>
-    <string name="saved_message">Saved</string>
-
+    <!-- History screen -->
     <string name="history_title">History</string>
-    <string name="insights_title">Insights</string>
-    <string name="settings_title">Settings</string>
+    <string name="history_empty">No drinks logged yet.\nStart tracking to see your history.</string>
+    <string name="history_clear_title">Clear History</string>
+    <string name="history_clear_message">Are you sure you want to delete all saved drink entries?</string>
+    <string name="history_clear_confirm">Delete</string>
+    <string name="history_clear_cancel">Cancel</string>
+    <string name="history_cleared_toast">History cleared</string>
 
-    <string name="select_predefined_drink">Select a predefined drink</string>
-    <string name="drink_saved">Drink saved</string>
-    <string name="enter_drink_name">Enter a drink name</string>
-    <string name="enter_valid_volume_abv">Enter valid volume and ABV</string>
+    <!-- Insights screen -->
+    <string name="insights_title">Insights</string>
+    <string name="insights_summary">Total this week: %1$s units\nAverage per day: %2$s units</string>
+    <string name="insights_no_data_feedback">No drinking data recorded in the last 7 days yet.</string>
+
+    <!-- Insights risk badge -->
+    <string name="risk_no_data">No Data</string>
+    <string name="risk_low">Low</string>
+    <string name="risk_moderate">Moderate</string>
+    <string name="risk_high">High</string>
+
+    <!-- Settings screen -->
+    <string name="settings_weekly_limit_label">Weekly Unit Guideline</string>
+    <string name="settings_weekly_limit_description">The NHS recommends no more than 14 units per week.</string>
+    <string name="settings_weekly_limit_value">Current limit: %1$d units</string>
+    <string name="settings_data_section_label">Data</string>
+    <string name="settings_clear_data_button">Clear All Data</string>
+    <string name="settings_clear_data_title">Clear All Data</string>
+    <string name="settings_clear_data_message">This will permanently delete all your drink history. Continue?</string>
+    <string name="settings_clear_data_confirm">Delete</string>
+    <string name="settings_clear_data_cancel">Cancel</string>
+    <string name="settings_cleared_toast">All data cleared</string>
+
+    <!-- Misc / legacy -->
+    <string name="saved_message">Saved</string>
 </resources>

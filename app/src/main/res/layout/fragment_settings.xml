@@ -1,14 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp">
 
-    <TextView
-        android:id="@+id/tv_settings"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Settings placeholder."
-        android:textSize="14sp" />
+        android:orientation="vertical">
+
+        <!-- ── Weekly Unit Guideline ─────────────────────────────── -->
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/settings_weekly_limit_label"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:layout_marginBottom="4dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/settings_weekly_limit_description"
+            android:textSize="13sp"
+            android:layout_marginBottom="8dp" />
+
+        <com.google.android.material.slider.Slider
+            android:id="@+id/slider_weekly_limit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:valueFrom="1"
+            android:valueTo="30"
+            android:stepSize="1"
+            android:value="14"
+            app:labelBehavior="floating" />
+
+        <TextView
+            android:id="@+id/tv_weekly_limit_value"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:layout_marginBottom="24dp" />
+
+        <!-- ── Divider ────────────────────────────────────────────── -->
+
+        <com.google.android.material.divider.MaterialDivider
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp" />
+
+        <!-- ── Data ───────────────────────────────────────────────── -->
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/settings_data_section_label"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:layout_marginBottom="8dp" />
+
+        <Button
+            android:id="@+id/btn_clear_all_data"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/settings_clear_data_button" />
+
+    </LinearLayout>
 
 </ScrollView>

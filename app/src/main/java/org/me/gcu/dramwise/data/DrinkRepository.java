@@ -42,7 +42,7 @@ public class DrinkRepository {
 
     /**
      * Returns the singleton instance of the repository.
-     * Uses double‑checked locking for thread‑safe lazy initialization.
+     * Uses double-checked locking for thread-safe lazy initialization.
      */
     public static DrinkRepository getInstance(Context context) {
         if (INSTANCE == null) {
@@ -64,7 +64,13 @@ public class DrinkRepository {
      * Room requires write operations to be off the main thread.
      */
     public void insert(DrinkEntry entry) {
-        executor.execute(() -> drinkDao.insert(entry));
+        executor.execute(() -> {
+            try {                                                             // FIXED
+                drinkDao.insert(entry);
+            } catch (Exception e) {
+                android.util.Log.e("DrinkRepository", "Failed to insert drink entry", e);
+            }
+        });
     }
 
     /**
@@ -110,10 +116,16 @@ public class DrinkRepository {
     }
 
     /**
-     *  Deletes all saved drink history on a background thread/
+     * Deletes all saved drink history on a background thread.
      */
     public void clearHistory() {
-        executor.execute(drinkDao::deleteAll);
+        executor.execute(() -> {
+            try {                                                             // FIXED
+                drinkDao.deleteAll();
+            } catch (Exception e) {
+                android.util.Log.e("DrinkRepository", "Failed to clear history", e);
+            }
+        });
     }
 
     // ---------------------------------------------------------
@@ -131,14 +143,26 @@ public class DrinkRepository {
      * Inserts a single DrinkType on a background thread.
      */
     public void insertDrinkType(DrinkType drinkType) {
-        executor.execute(() -> drinkTypeDao.insert(drinkType));
+        executor.execute(() -> {
+            try {                                                             // FIXED
+                drinkTypeDao.insert(drinkType);
+            } catch (Exception e) {
+                android.util.Log.e("DrinkRepository", "Failed to insert drink type", e);
+            }
+        });
     }
 
     /**
      * Inserts multiple DrinkTypes on a background thread.
      */
     public void insertDrinkTypes(List<DrinkType> drinkTypes) {
-        executor.execute(() -> drinkTypeDao.insertAll(drinkTypes));
+        executor.execute(() -> {
+            try {                                                             // FIXED
+                drinkTypeDao.insertAll(drinkTypes);
+            } catch (Exception e) {
+                android.util.Log.e("DrinkRepository", "Failed to insert drink types", e);
+            }
+        });
     }
 
     /**
@@ -147,18 +171,22 @@ public class DrinkRepository {
      */
     public void seedDrinkTypesIfEmpty() {
         executor.execute(() -> {
-            int count = drinkTypeDao.getCount();
-            if (count == 0) {
-                drinkTypeDao.insertAll(java.util.Arrays.asList(
-                        new DrinkType("Guinness", "Beer", 568, 4.2),
-                        new DrinkType("Heineken", "Beer", 568, 5.0),
-                        new DrinkType("Budweiser", "Beer", 568, 5.0),
-                        new DrinkType("Corona", "Beer", 355, 4.6),
-                        new DrinkType("Peroni", "Beer", 330, 5.1),
-                        new DrinkType("Stella Artois", "Beer", 568, 5.2),
-                        new DrinkType("Carlsberg", "Beer", 568, 3.8),
-                        new DrinkType("Coors Light", "Beer", 568, 4.0)
-                ));
+            try {                                                             // FIXED
+                int count = drinkTypeDao.getCount();
+                if (count == 0) {
+                    drinkTypeDao.insertAll(java.util.Arrays.asList(
+                            new DrinkType("Guinness", "Beer", 568, 4.2),
+                            new DrinkType("Heineken", "Beer", 568, 5.0),
+                            new DrinkType("Budweiser", "Beer", 568, 5.0),
+                            new DrinkType("Corona", "Beer", 355, 4.6),
+                            new DrinkType("Peroni", "Beer", 330, 5.1),
+                            new DrinkType("Stella Artois", "Beer", 568, 5.2),
+                            new DrinkType("Carlsberg", "Beer", 568, 3.8),
+                            new DrinkType("Coors Light", "Beer", 568, 4.0)
+                    ));
+                }
+            } catch (Exception e) {
+                android.util.Log.e("DrinkRepository", "Failed to seed drink types", e);
             }
         });
     }
