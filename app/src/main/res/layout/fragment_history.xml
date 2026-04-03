@@ -1,40 +1,100 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-    Scrollable container for the history screen.
-    Ensures long text histories remain accessible on all screen sizes.
--->
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp">
+    android:orientation="vertical">
 
-    <!--
-        Vertical layout holding the "Clear History" button
-        and the text-based list of drink entries.
-    -->
+    <!-- ── Header ─────────────────────────────────────────────────── -->
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="horizontal"
+        android:paddingStart="20dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="20dp"
+        android:paddingBottom="8dp"
+        android:gravity="center_vertical">
 
-        <!-- Button allowing the user to delete all saved drink entries -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/history_title"
+                android:textSize="32sp"
+                android:textStyle="bold"
+                android:textColor="?attr/colorOnSurface" />
+
+            <TextView
+                android:id="@+id/tv_entry_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:textColor="?attr/colorOnSurfaceVariant" />
+
+        </LinearLayout>
+
         <Button
             android:id="@+id/btn_clear_history"
+            style="@style/Widget.Material3.Button.OutlinedButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
-            android:text="Clear History" />
-
-        <!--
-            Displays the formatted history of drink entries.
-            Starts with a placeholder message until data is loaded.
-        -->
-        <TextView
-            android:id="@+id/tv_history"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="No drinks logged yet.\nStart tracking to see your history."
-            android:textSize="14sp" />
+            android:text="@string/history_clear_title" />
 
     </LinearLayout>
-</ScrollView>
+
+    <!-- ── Content area ───────────────────────────────────────────── -->
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <!-- Entry list -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_history"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingTop="8dp"
+            android:paddingBottom="16dp"
+            android:clipToPadding="false"
+            android:visibility="gone" />
+
+        <!-- Empty state -->
+        <LinearLayout
+            android:id="@+id/layout_empty"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="32dp"
+            android:visibility="visible">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="No drinks logged yet"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="?attr/colorOnSurface"
+                android:gravity="center" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Start tracking to see your history"
+                android:textSize="14sp"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:gravity="center"
+                android:layout_marginTop="8dp" />
+
+        </LinearLayout>
+
+    </FrameLayout>
+
+</LinearLayout>

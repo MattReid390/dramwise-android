@@ -23,6 +23,12 @@
     <string name="today_label">Today</string>
     <string name="today_drinks">Drinks: %1$d</string>
     <string name="today_units">Units: %1$.2f</string>
+    <string name="dashboard_drinks_label">Drinks</string>
+    <string name="dashboard_units_label">Units</string>
+    <string name="dashboard_today_sublabel">today</string>
+    <string name="dashboard_this_week">This Week</string>
+    <string name="dashboard_weekly_progress">%1$.1f / %2$d units</string>
+    <string name="dashboard_weekly_guideline">NHS recommended limit: 14 units/week</string>
 
     <!-- History screen -->
     <string name="history_title">History</string>

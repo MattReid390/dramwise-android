@@ -21,4 +21,7 @@ public interface DrinkTypeDao {
 
     @Query("SELECT COUNT(*) FROM drink_types")
     int getCount();
+
+    @Query("SELECT COUNT(*) FROM drink_types WHERE category = :category")
+    int getCountByCategory(String category);
 }

@@ -2,71 +2,165 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:padding="16dp">
+    android:layout_height="match_parent">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- ── Weekly Unit Guideline ─────────────────────────────── -->
+        <!-- ── Header ────────────────────────────────────────────────── -->
 
-        <TextView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/settings_weekly_limit_label"
-            android:textStyle="bold"
-            android:textSize="16sp"
-            android:layout_marginBottom="4dp" />
+            android:orientation="vertical"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:paddingTop="20dp"
+            android:paddingBottom="12dp">
 
-        <TextView
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Settings"
+                android:textSize="32sp"
+                android:textStyle="bold"
+                android:textColor="?attr/colorOnSurface" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Personalise your experience"
+                android:textSize="14sp"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:layout_marginTop="2dp" />
+
+        </LinearLayout>
+
+        <!-- ── Weekly Limit Card ──────────────────────────────────────── -->
+
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/settings_weekly_limit_description"
-            android:textSize="13sp"
-            android:layout_marginBottom="8dp" />
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="12dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="2dp">
 
-        <com.google.android.material.slider.Slider
-            android:id="@+id/slider_weekly_limit"
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Weekly Unit Guideline"
+                    android:textSize="12sp"
+                    android:textAllCaps="true"
+                    android:letterSpacing="0.08"
+                    android:textColor="?attr/colorPrimary"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="6dp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/settings_weekly_limit_description"
+                    android:textSize="14sp"
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    android:layout_marginBottom="16dp" />
+
+                <com.google.android.material.slider.Slider
+                    android:id="@+id/slider_weekly_limit"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="-8dp"
+                    android:layout_marginEnd="-8dp"
+                    android:valueFrom="1"
+                    android:valueTo="30"
+                    android:stepSize="1"
+                    android:value="14"
+                    app:labelBehavior="floating" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginTop="4dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Current limit:"
+                        android:textSize="14sp"
+                        android:textColor="?attr/colorOnSurfaceVariant" />
+
+                    <TextView
+                        android:id="@+id/tv_weekly_limit_value"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:textColor="?attr/colorPrimary"
+                        android:layout_marginStart="4dp" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- ── Data Management Card ───────────────────────────────────── -->
+
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:valueFrom="1"
-            android:valueTo="30"
-            android:stepSize="1"
-            android:value="14"
-            app:labelBehavior="floating" />
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="20dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="2dp">
 
-        <TextView
-            android:id="@+id/tv_weekly_limit_value"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="14sp"
-            android:layout_marginBottom="24dp" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
 
-        <!-- ── Divider ────────────────────────────────────────────── -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Data Management"
+                    android:textSize="12sp"
+                    android:textAllCaps="true"
+                    android:letterSpacing="0.08"
+                    android:textColor="?attr/colorPrimary"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="6dp" />
 
-        <com.google.android.material.divider.MaterialDivider
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp" />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Permanently delete all logged drink entries. This action cannot be undone."
+                    android:textSize="14sp"
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    android:layout_marginBottom="16dp" />
 
-        <!-- ── Data ───────────────────────────────────────────────── -->
+                <Button
+                    android:id="@+id/btn_clear_all_data"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/settings_clear_data_button" />
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/settings_data_section_label"
-            android:textStyle="bold"
-            android:textSize="16sp"
-            android:layout_marginBottom="8dp" />
+            </LinearLayout>
 
-        <Button
-            android:id="@+id/btn_clear_all_data"
-            style="@style/Widget.Material3.Button.OutlinedButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/settings_clear_data_button" />
+        </com.google.android.material.card.MaterialCardView>
 
     </LinearLayout>
 

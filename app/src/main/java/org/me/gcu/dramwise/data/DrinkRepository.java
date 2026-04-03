@@ -166,25 +166,56 @@ public class DrinkRepository {
     }
 
     /**
-     * Seeds the database with default drink types if none exist.
-     * Runs once on first launch to populate the app with common beers.
+     * Seeds each drink category independently if that category has no entries.
+     * This allows new categories to be added to existing installs without
+     * requiring a full data wipe.
      */
     public void seedDrinkTypesIfEmpty() {
         executor.execute(() -> {
-            try {                                                             // FIXED
-                int count = drinkTypeDao.getCount();
-                if (count == 0) {
+            try {
+                if (drinkTypeDao.getCountByCategory("Beer") == 0) {
                     drinkTypeDao.insertAll(java.util.Arrays.asList(
-                            new DrinkType("Guinness", "Beer", 568, 4.2),
-                            new DrinkType("Heineken", "Beer", 568, 5.0),
-                            new DrinkType("Budweiser", "Beer", 568, 5.0),
-                            new DrinkType("Corona", "Beer", 355, 4.6),
-                            new DrinkType("Peroni", "Beer", 330, 5.1),
+                            new DrinkType("Guinness",      "Beer", 568, 4.2),
+                            new DrinkType("Heineken",      "Beer", 568, 5.0),
+                            new DrinkType("Budweiser",     "Beer", 568, 5.0),
+                            new DrinkType("Corona",        "Beer", 355, 4.6),
+                            new DrinkType("Peroni",        "Beer", 330, 5.1),
                             new DrinkType("Stella Artois", "Beer", 568, 5.2),
-                            new DrinkType("Carlsberg", "Beer", 568, 3.8),
-                            new DrinkType("Coors Light", "Beer", 568, 4.0)
+                            new DrinkType("Carlsberg",     "Beer", 568, 3.8),
+                            new DrinkType("Coors Light",   "Beer", 568, 4.0)
                     ));
                 }
+
+                if (drinkTypeDao.getCountByCategory("Wine") == 0) {
+                    drinkTypeDao.insertAll(java.util.Arrays.asList(
+                            new DrinkType("Red Wine",   "Wine", 175, 13.5),
+                            new DrinkType("White Wine", "Wine", 175, 12.5),
+                            new DrinkType("Rosé Wine",  "Wine", 175, 12.0),
+                            new DrinkType("Prosecco",   "Wine", 125, 11.0),
+                            new DrinkType("Champagne",  "Wine", 125, 12.0)
+                    ));
+                }
+
+                if (drinkTypeDao.getCountByCategory("Spirit") == 0) {
+                    drinkTypeDao.insertAll(java.util.Arrays.asList(
+                            new DrinkType("Vodka",   "Spirit", 25, 40.0),
+                            new DrinkType("Gin",     "Spirit", 25, 40.0),
+                            new DrinkType("Whisky",  "Spirit", 25, 40.0),
+                            new DrinkType("Rum",     "Spirit", 25, 40.0),
+                            new DrinkType("Tequila", "Spirit", 25, 40.0)
+                    ));
+                }
+
+                if (drinkTypeDao.getCountByCategory("Cocktail") == 0) {
+                    drinkTypeDao.insertAll(java.util.Arrays.asList(
+                            new DrinkType("Mojito",        "Cocktail", 200, 10.0),
+                            new DrinkType("Margarita",     "Cocktail", 150, 15.0),
+                            new DrinkType("Gin & Tonic",   "Cocktail", 200,  8.0),
+                            new DrinkType("Vodka & Mixer", "Cocktail", 200,  5.0),
+                            new DrinkType("Pina Colada",   "Cocktail", 200, 10.0)
+                    ));
+                }
+
             } catch (Exception e) {
                 android.util.Log.e("DrinkRepository", "Failed to seed drink types", e);
             }

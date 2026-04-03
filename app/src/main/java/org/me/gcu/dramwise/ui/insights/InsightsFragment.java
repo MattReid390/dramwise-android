@@ -83,6 +83,7 @@ public class InsightsFragment extends Fragment {
         barChart.setDrawValueAboveBar(true);
         barChart.setScaleEnabled(false);
         barChart.setPinchZoom(false);
+        barChart.setExtraBottomOffset(4f);
 
         Description description = new Description();
         description.setText("");
@@ -91,14 +92,22 @@ public class InsightsFragment extends Fragment {
         Legend legend = barChart.getLegend();
         legend.setEnabled(false);
 
+        int labelColor = Color.parseColor("#757575");
+
         XAxis xAxis = barChart.getXAxis();
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
         xAxis.setGranularity(1f);
         xAxis.setDrawGridLines(false);
+        xAxis.setTextColor(labelColor);
+        xAxis.setTextSize(11f);
 
         YAxis leftAxis = barChart.getAxisLeft();
         leftAxis.setAxisMinimum(0f);
         leftAxis.setGranularity(1f);
+        leftAxis.setTextColor(labelColor);
+        leftAxis.setTextSize(11f);
+        leftAxis.setDrawGridLines(true);
+        leftAxis.setGridColor(Color.parseColor("#EEEEEE"));
 
         YAxis rightAxis = barChart.getAxisRight();
         rightAxis.setEnabled(false);
@@ -164,7 +173,8 @@ public class InsightsFragment extends Fragment {
         }
 
         BarDataSet dataSet = new BarDataSet(entries, "Units per Day");
-        dataSet.setValueTextSize(12f);
+        dataSet.setValueTextSize(11f);
+        dataSet.setValueTextColor(Color.parseColor("#1B5E20"));
         dataSet.setColor(Color.parseColor("#4CAF50"));
 
         BarData barData = new BarData(dataSet);

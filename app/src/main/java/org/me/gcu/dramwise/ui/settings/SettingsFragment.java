@@ -44,12 +44,12 @@ public class SettingsFragment extends Fragment {
         // Restore saved limit, falling back to the NHS default of 14 units
         int savedLimit = prefs.getInt(KEY_WEEKLY_LIMIT, DEFAULT_WEEKLY_LIMIT);
         slider.setValue(savedLimit);
-        tvLimit.setText(getString(R.string.settings_weekly_limit_value, savedLimit));
+        tvLimit.setText(savedLimit + " units");
 
         // Persist the chosen limit and update the label whenever the slider moves
         slider.addOnChangeListener((s, value, fromUser) -> {
             int limit = (int) value;
-            tvLimit.setText(getString(R.string.settings_weekly_limit_value, limit));
+            tvLimit.setText(limit + " units");
             prefs.edit().putInt(KEY_WEEKLY_LIMIT, limit).apply();
         });
 

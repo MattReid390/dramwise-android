@@ -6,7 +6,6 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
@@ -35,7 +34,6 @@ public class AddDrinkFragment extends Fragment {
     private TextView tvPreview;
     private Button btnSave;
 
-    private final List<DrinkType> drinkTypeList = new ArrayList<>();
 
     @Nullable
     @Override
@@ -78,35 +76,43 @@ public class AddDrinkFragment extends Fragment {
     private void loadDrinkTypes() {
         DrinkRepository.getInstance(requireContext()).getAllDrinkTypes()
                 .observe(getViewLifecycleOwner(), drinkTypes -> {
-                    drinkTypeList.clear();
 
-                    List<String> names = new ArrayList<>();
-                    names.add(getString(R.string.select_predefined_drink)); // FIXED
+                    List<SectionedDrinkAdapter.SpinnerItem> items = new ArrayList<>();
+                    items.add(new SectionedDrinkAdapter.SpinnerItem(
+                            getString(R.string.select_predefined_drink), false));
+
+                    String[] categories   = {"Beer",  "Wine",  "Spirit",  "Cocktail"};
+                    String[] sectionLabels = {"Beers", "Wines", "Spirits", "Cocktails"};
 
                     if (drinkTypes != null) {
-                        drinkTypeList.addAll(drinkTypes);
-                        for (DrinkType drinkType : drinkTypes) {
-                            names.add(drinkType.name);
+                        for (int i = 0; i < categories.length; i++) {
+                            boolean headerAdded = false;
+                            for (DrinkType dt : drinkTypes) {
+                                if (categories[i].equals(dt.category)) {
+                                    if (!headerAdded) {
+                                        items.add(new SectionedDrinkAdapter.SpinnerItem(
+                                                sectionLabels[i], true));
+                                        headerAdded = true;
+                                    }
+                                    items.add(new SectionedDrinkAdapter.SpinnerItem(dt));
+                                }
+                            }
                         }
                     }
 
-                    ArrayAdapter<String> adapter = new ArrayAdapter<>(
-                            requireContext(),
-                            android.R.layout.simple_spinner_item,
-                            names
-                    );
-                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                    SectionedDrinkAdapter adapter =
+                            new SectionedDrinkAdapter(requireContext(), items);
                     spinnerDrinkType.setAdapter(adapter);
 
                     spinnerDrinkType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                         @Override
                         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                            if (position == 0) return;
+                            SectionedDrinkAdapter.SpinnerItem item = adapter.getItem(position);
+                            if (item.drinkType == null) return; // prompt or header
 
-                            DrinkType selected = drinkTypeList.get(position - 1);
-                            etName.setText(selected.name);
-                            etVolume.setText(String.format(Locale.UK, "%.0f", selected.defaultVolumeMl));
-                            etAbv.setText(String.format(Locale.UK, "%.1f", selected.abv));
+                            etName.setText(item.drinkType.name);
+                            etVolume.setText(String.format(Locale.UK, "%.0f", item.drinkType.defaultVolumeMl));
+                            etAbv.setText(String.format(Locale.UK, "%.1f", item.drinkType.abv));
                             updatePreview();
                         }
 
@@ -120,7 +126,7 @@ public class AddDrinkFragment extends Fragment {
         double volume = parseDouble(etVolume.getText().toString());
         double abv = parseDouble(etAbv.getText().toString());
         double units = UnitsCalculator.calculateUnits(volume, abv);
-        tvPreview.setText(getString(R.string.preview_units, units)); // FIXED
+        tvPreview.setText(String.format(Locale.UK, "%.2f", units));
     }
 
     private void saveDrink() {
